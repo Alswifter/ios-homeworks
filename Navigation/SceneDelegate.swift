@@ -7,17 +7,101 @@
 
 import UIKit
 
+struct Post {
+    let title: String
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        window = UIWindow(windowScene: windowScene)
+
+        let tabBarController = UITabBarController()
+
+        let feedViewController = UINavigationController(rootViewController: FeedViewController())
+        feedViewController.tabBarItem = UITabBarItem(title: "Лента", image: UIImage(systemName: "house"), tag: 0)
+
+        let profileViewController = UINavigationController(rootViewController: ProfileViewController())
+        profileViewController.tabBarItem = UITabBarItem(title: "Профиль", image: UIImage(systemName: "person"), tag: 1)
+
+        tabBarController.viewControllers = [feedViewController, profileViewController]
+
+        window?.rootViewController = tabBarController
+        window?.makeKeyAndVisible()
     }
+}
+
+class PostViewController: UIViewController {
+
+    let post: Post
+
+    init(post: Post) {
+        self.post = post
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .systemYellow
+        title = post.title
+
+        let infoButton = UIBarButtonItem(title: "Info", style: .plain, target: self, action: #selector(showInfoController))
+        navigationItem.rightBarButtonItem = infoButton
+    }
+
+    @objc func showInfoController() {
+        let infoViewController = InfoViewController()
+        let navigationController = UINavigationController(rootViewController: infoViewController)
+        navigationController.modalPresentationStyle = .fullScreen
+        present(navigationController, animated: true, completion: nil)
+    }
+}
+
+class InfoViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .white
+
+        let button = UIButton(type: .system)
+        button.setTitle("Show Alert", for: .normal)
+        button.addTarget(self, action: #selector(showAlert), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(button)
+
+        NSLayoutConstraint.activate([
+            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            button.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+
+    @objc func showAlert() {
+        let alertController = UIAlertController(title: "Alert", message: "This is an alert message.", preferredStyle: .alert)
+
+        let okAction = UIAlertAction(title: "OK", style: .default) { _ in
+            print("OK button tapped")
+        }
+
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            print("Cancel button tapped")
+        }
+
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+
+        present(alertController, animated: true, completion: nil)
+    }
+}
+
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
@@ -48,5 +132,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
 
-}
+
 
